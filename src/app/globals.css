@@ -115,5 +115,3 @@
     @apply font-mono bg-mol-primary border border-border-subtle text-txt-primary text-sm px-3 py-2 outline-none transition-colors focus:border-cyan placeholder:text-txt-muted;
   }
 }
-
-
