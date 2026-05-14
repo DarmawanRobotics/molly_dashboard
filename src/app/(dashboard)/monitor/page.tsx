@@ -1,6 +1,6 @@
 "use client";
-import Sidebar from "./_components/sidebar";
 import Placeholder from "@/components/placeholder";
+import Sidebar from "./_components/sidebar";
 
 export default function MonitorPage() {
   return (
