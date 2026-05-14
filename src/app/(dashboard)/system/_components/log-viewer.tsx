@@ -123,7 +123,7 @@ export default function LogViewer() {
             key={l.id}
             className="flex items-start gap-3 px-2 py-1 hover:bg-mol-secondary transition-colors"
           >
-            <span className="text-txt-muted w-16">{l.timestamp}</span>
+            <span className="text-txt-muted w-20">{l.timestamp}</span>
             <span className={`w-12 font-bold uppercase ${color[l.level]}`}>
               {l.level}
             </span>
