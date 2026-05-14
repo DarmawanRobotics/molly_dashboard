@@ -1,5 +1,6 @@
 "use client";
 import type React from "react";
+import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { RosProvider } from "@/components/providers/ros-provider";
 
@@ -15,6 +16,7 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-hidden flex min-h-0 w-full">
           {children}
         </main>
+        <Footer />
       </div>
     </RosProvider>
   );
