@@ -41,6 +41,7 @@ const DEFAULT_STATE: RobotState = {
   position: {
     x: 2.5,
     y: 1.8,
+    yaw: -0.5,
   },
 
   imu: {

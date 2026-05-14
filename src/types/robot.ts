@@ -15,6 +15,7 @@ export interface RobotState {
   position: {
     x: number;
     y: number;
+    yaw: number;
   };
 
   velocity: {
