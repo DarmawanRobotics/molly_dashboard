@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 export function AppSidebar({
   title,
   children,
-  width = "w-[320px]",
   side = "right",
+  width = "w-[320px]",
 }: {
   title: string;
   children: ReactNode;
-  width?: string;
   side?: "left" | "right";
+  width?: string;
 }) {
   return (
     <aside
@@ -25,7 +25,7 @@ export function AppSidebar({
         <span className="label">{title}</span>
       </header>
 
-      {children}
+      <div className="flex flex-col">{children}</div>
     </aside>
   );
 }

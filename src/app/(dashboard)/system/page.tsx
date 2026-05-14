@@ -1,30 +1,35 @@
 "use client";
 
-import { Cpu, Server, Wifi } from "lucide-react";
+import { AppPlaceholder } from "@/components/layout/app/placeholder";
+import { AppSection } from "@/components/layout/app/section";
 import { AppSidebar } from "@/components/layout/app/sidebar";
 
 export default function SystemPage() {
   return (
-    <>
+    <div className="flex h-full w-full min-h-0">
+      {/* MAIN */}
       <div className="flex-1 p-3">
-        <div className="panel h-full flex items-center justify-center">
-          SYSTEM OVERVIEW
-        </div>
+        <AppPlaceholder label="SYSTEM OVERVIEW" />
       </div>
 
+      {/* SIDEBAR */}
       <AppSidebar title="SYSTEM" width="w-[320px]">
-        <div className="p-3 flex items-center gap-2 text-sm text-txt-secondary">
-          <Cpu size={14} /> CPU
-        </div>
+        <AppSection title="Network">
+          <AppPlaceholder label="ROS / WS / VIDEO" />
+        </AppSection>
 
-        <div className="p-3 flex items-center gap-2 text-sm text-txt-secondary">
-          <Wifi size={14} /> Network
-        </div>
+        <AppSection title="Hardware">
+          <AppPlaceholder label="JETSON / CPU / GPU" />
+        </AppSection>
 
-        <div className="p-3 flex items-center gap-2 text-sm text-txt-secondary">
-          <Server size={14} /> ROS
-        </div>
+        <AppSection title="LLM">
+          <AppPlaceholder label="MODEL CONFIG" />
+        </AppSection>
+
+        <AppSection title="Navigation">
+          <AppPlaceholder label="NAV2 PARAMS" />
+        </AppSection>
       </AppSidebar>
-    </>
+    </div>
   );
 }
