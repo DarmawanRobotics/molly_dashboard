@@ -6,6 +6,9 @@ pre-commit:
 
     type-check:
       run: pnpm type-check
+    
+    add-files:
+      run: git add .
 
 commit-msg:
   commands:
