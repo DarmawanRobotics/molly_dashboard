@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("font-mono", jetbrainsMono.variable)}
+      className={cn("font-mono dark", jetbrainsMono.variable)}
       suppressHydrationWarning
     >
       <body>{children}</body>
