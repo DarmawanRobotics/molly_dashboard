@@ -1,11 +1,19 @@
 "use client";
 
-import { Camera, ChartNoAxesColumnIncreasing, MapIcon } from "lucide-react";
+import {
+  Camera,
+  ChartNoAxesColumnIncreasing,
+  MapIcon,
+  MessageSquare,
+  Radio,
+} from "lucide-react";
 import { AppPlaceholder } from "@/components/layout/app/placeholder";
 import { AppSection } from "@/components/layout/app/section";
 import { AppSidebar } from "@/components/layout/app/sidebar";
 import type { POI } from "@/types";
 import { CameraFeed } from "./_components/camera-feed";
+import { CommsPanel } from "./_components/comm-panel";
+import { LLMPanel } from "./_components/llm-panel";
 import { RobotStatus } from "./_components/robot-status";
 import { TourControl } from "./_components/tour-control";
 
@@ -88,8 +96,15 @@ export default function MonitorPage() {
           <TourControl pois={MOCK_POIS} />
         </AppSection>
 
-        <AppSection title="Telemetry">
-          <AppPlaceholder label="CPU / RAM / GPU" />
+        <AppSection
+          title="LLM Conversation"
+          icon={<MessageSquare size={16} />}
+          className="flex flex-col h-60"
+        >
+          <LLMPanel />
+        </AppSection>
+        <AppSection title="Communications" icon={<Radio size={16} />}>
+          <CommsPanel />
         </AppSection>
       </AppSidebar>
     </div>
