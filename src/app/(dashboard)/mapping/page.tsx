@@ -1,29 +1,42 @@
 "use client";
 
-import { AppPlaceholder } from "@/components/layout/app/placeholder";
-import { AppSection } from "@/components/layout/app/section";
-import { AppSidebar } from "@/components/layout/app/sidebar";
+import { useState } from "react";
 
-export default function MappingPage() {
-  return (
-    <div className="flex h-full w-full min-h-0">
-      <div className="flex-1 p-3">
-        <AppPlaceholder label="SLAM MAP CANVAS" />
-      </div>
+import type { MapMeta, POI } from "@/types";
 
-      <AppSidebar width="w-[380px]">
-        <AppSection title="SLAM Control">
-          <AppPlaceholder label="START / STOP SLAM" />
-        </AppSection>
+import { MappingPage } from "./_components/mapping-page";
 
-        <AppSection title="POI Management">
-          <AppPlaceholder label="POI LIST + EDITOR" />
-        </AppSection>
+const initialPois: POI[] = [
+  {
+    id: "poi-1",
+    name: "Entrance Gate",
+    description: "Main entrance",
+    x: 12,
+    y: 44,
+    narrationText: "Welcome",
+    motionAction: "wave",
+    dwellTimeSec: 20,
+    orderIndex: 0,
+    mapId: "map-1",
+  },
+];
 
-        <AppSection title="Saved Maps">
-          <AppPlaceholder label="MAPS STORAGE" />
-        </AppSection>
-      </AppSidebar>
-    </div>
-  );
+const initialMaps: MapMeta[] = [
+  {
+    id: "map-1",
+    name: "Museum Jakarta",
+    file: "museum_jakarta.map",
+    date: "2026-05-14",
+    size: "24 MB",
+    poi_count: 1,
+    active: true,
+  },
+];
+
+export default function Page() {
+  const [pois] = useState<POI[]>(initialPois);
+
+  const [maps] = useState<MapMeta[]>(initialMaps);
+
+  return <MappingPage maps={maps} pois={pois} isMapping={false} />;
 }
