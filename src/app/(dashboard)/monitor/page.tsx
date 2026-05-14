@@ -1,30 +1,33 @@
 "use client";
 
+import { Camera, ChartNoAxesColumnIncreasing } from "lucide-react";
 import { AppPlaceholder } from "@/components/layout/app/placeholder";
 import { AppSection } from "@/components/layout/app/section";
 import { AppSidebar } from "@/components/layout/app/sidebar";
+import { CameraFeed } from "./_components/camera-feed";
+import { RobotStatus } from "./_components/robot-status";
 
 export default function MonitorPage() {
   return (
     <div className="flex h-full w-full min-h-0">
-      {/* LEFT */}
-      <AppSidebar title="CAMERA" side="left" width="w-[260px]">
-        <AppSection title="Camera Feed">
-          <AppPlaceholder label="RGB FRONT" />
+      <AppSidebar side="left" width="w-[260px]">
+        <AppSection title="Camera Feed" icon={<Camera size={16} />}>
+          <CameraFeed label="RGB" />
+          <CameraFeed label="Depth" />
         </AppSection>
-
-        <AppSection title="Depth">
-          <AppPlaceholder label="DEPTH STREAM" />
+        <AppSection
+          title="RobotStatus"
+          icon={<ChartNoAxesColumnIncreasing size={16} />}
+        >
+          <RobotStatus />
         </AppSection>
       </AppSidebar>
 
-      {/* CENTER */}
       <div className="flex-1 p-3">
         <AppPlaceholder label="MAP CANVAS" />
       </div>
 
-      {/* RIGHT */}
-      <AppSidebar title="ROBOT STATUS" width="w-[300px]">
+      <AppSidebar width="w-[300px]">
         <AppSection title="State">
           <AppPlaceholder label="FSM STATUS" />
         </AppSection>

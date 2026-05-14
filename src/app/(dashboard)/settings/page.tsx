@@ -10,7 +10,7 @@ export default function SettingsPage() {
       <div className="flex-1 p-3">
         <AppPlaceholder label="SETTINGS OVERVIEW" />
       </div>
-      <AppSidebar title="SETTINGS" width="w-[380px]">
+      <AppSidebar width="w-[380px]">
         <AppSection title="POI Management">
           <AppPlaceholder label="EDIT POI LIST" />
         </AppSection>

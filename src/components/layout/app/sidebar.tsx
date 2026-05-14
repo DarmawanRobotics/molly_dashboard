@@ -1,12 +1,10 @@
 import type { ReactNode } from "react";
 
 export function AppSidebar({
-  title,
   children,
   side = "right",
   width = "w-[320px]",
 }: {
-  title: string;
   children: ReactNode;
   side?: "left" | "right";
   width?: string;
@@ -21,10 +19,6 @@ export function AppSidebar({
           : "border-l border-border-subtle",
       ].join(" ")}
     >
-      <header className="border-b border-border-subtle p-3">
-        <span className="label">{title}</span>
-      </header>
-
       <div className="flex flex-col">{children}</div>
     </aside>
   );

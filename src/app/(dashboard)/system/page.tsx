@@ -13,7 +13,7 @@ export default function SystemPage() {
       </div>
 
       {/* SIDEBAR */}
-      <AppSidebar title="SYSTEM" width="w-[320px]">
+      <AppSidebar width="w-[320px]">
         <AppSection title="Network">
           <AppPlaceholder label="ROS / WS / VIDEO" />
         </AppSection>

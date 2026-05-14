@@ -36,6 +36,12 @@ const DEFAULT_STATE: RobotState = {
     linear: 0.35,
     angular: 0.02,
   },
+  speed_mode: "MEDIUM",
+
+  position: {
+    x: 2.5,
+    y: 1.8,
+  },
 
   imu: {
     roll: 0.8,

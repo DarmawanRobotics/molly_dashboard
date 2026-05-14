@@ -10,6 +10,12 @@ export interface RobotState {
   gpu_temp: number;
 
   gait_mode: GaitMode;
+  speed_mode: "LOW" | "MEDIUM" | "FAST";
+
+  position: {
+    x: number;
+    y: number;
+  };
 
   velocity: {
     linear: number;

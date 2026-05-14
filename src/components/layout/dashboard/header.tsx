@@ -2,22 +2,16 @@
 
 import { Bot, OctagonX } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { FSM_STATES } from "@/constants/fsm-states";
 import { TABS } from "@/constants/tabs";
 import { cn } from "@/lib/utils";
 import { useRobotStore } from "@/stores/use-robot-store";
-import type { FSMStateKey } from "@/types";
 
-/**
- * Main application header.
- */
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const fsmState = useRobotStore((state) => state.fsmState) as FSMStateKey;
+
   const isEstop = useRobotStore((state) => state.isEstop);
   const toggleEstop = useRobotStore((state) => state.toggleEstop);
-  const info = FSM_STATES[fsmState] || FSM_STATES.IDLE;
 
   return (
     <header className="h-13 shrink-0 border-b border-border-subtle bg-mol-primary px-5">
@@ -33,27 +27,13 @@ export function Header() {
               <span className="font-mono text-base font-bold tracking-tight">
                 MOLLY
               </span>
-
               <span className="text-[11px] text-txt-muted">v0.1.0</span>
             </div>
           </div>
-          <div className="h-6 w-px bg-border-subtle" />
-          <div
-            className={cn(
-              "flex items-center gap-2 border px-3 py-1",
-              info.bgClass,
-              info.borderClass,
-            )}
-          >
-            <div className={cn("h-2 w-2 animate-pulse-dot", info.dotClass)} />
-            <span
-              className={cn("font-mono text-xs font-semibold", info.textClass)}
-            >
-              {info.label}
-            </span>
-          </div>
 
+          {/* E-STOP */}
           <div className="h-6 w-px bg-border-subtle" />
+
           <button
             type="button"
             onClick={toggleEstop}
@@ -68,10 +48,13 @@ export function Header() {
             {isEstop ? "E-STOP ACTIVE" : "E-STOP"}
           </button>
         </div>
+
+        {/* Tabs */}
         <nav className="flex gap-0.5">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const active = pathname === tab.href;
+
             return (
               <button
                 key={tab.href}
@@ -85,7 +68,6 @@ export function Header() {
                 )}
               >
                 <Icon size={13} />
-
                 {tab.label}
               </button>
             );

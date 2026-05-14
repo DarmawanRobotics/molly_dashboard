@@ -11,7 +11,7 @@ export default function MappingPage() {
         <AppPlaceholder label="SLAM MAP CANVAS" />
       </div>
 
-      <AppSidebar title="MAPPING" width="w-[380px]">
+      <AppSidebar width="w-[380px]">
         <AppSection title="SLAM Control">
           <AppPlaceholder label="START / STOP SLAM" />
         </AppSection>
