@@ -4,56 +4,147 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* ============================================================================
+ * Design Tokens — Molly Dashboard
+ * Single source of truth. Shadcn semantic tokens are MAPPED to Molly tokens
+ * at the bottom so Base UI components inherit the dark aesthetic.
+ * ========================================================================= */
+
 @theme {
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
+  /* --------------------------------------------------------------------------
+   * Surfaces (background layers, dark-first)
+   * Ordered from deepest to most elevated.
+   * ----------------------------------------------------------------------- */
+  --color-mol-root: #0a0a0a; /* page background */
+  --color-mol-primary: #111111; /* header, footer, sidebar */
+  --color-mol-secondary: #1a1a1a; /* panels */
+  --color-mol-tertiary: #262626; /* panel-inset, hover states */
+  --color-mol-elevated: #2e2e2e; /* active tabs, raised buttons */
 
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.145 0 0);
-
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.145 0 0);
-
-  --color-primary: oklch(0.205 0 0);
-  --color-primary-foreground: oklch(0.985 0 0);
-
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-
-  --color-accent: oklch(0.97 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
-
-  --color-destructive: oklch(0.577 0.245 27.325);
-
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
-
-  --color-cyan: #22d3ee;
-  --color-cyan-light: #67e8f9;
-
-  --color-red: #ef4444;
-
-  --color-mol-root: #0a0a0a;
-  --color-mol-primary: #111111;
-  --color-mol-secondary: #1a1a1a;
-  --color-mol-tertiary: #262626;
-
+  /* --------------------------------------------------------------------------
+   * Text
+   * ----------------------------------------------------------------------- */
   --color-txt-primary: #ffffff;
   --color-txt-secondary: #a3a3a3;
   --color-txt-tertiary: #737373;
   --color-txt-muted: #525252;
 
+  /* --------------------------------------------------------------------------
+   * Borders
+   * ----------------------------------------------------------------------- */
   --color-border-subtle: #262626;
+  --color-border: #3a3a3a;
+  --color-border-strong: #4a4a4a;
 
-  --radius: 0.625rem;
+  /* --------------------------------------------------------------------------
+   * Accent palette (with -light variants for hover states)
+   * ----------------------------------------------------------------------- */
+  --color-cyan: #22d3ee;
+  --color-cyan-light: #67e8f9;
 
+  --color-violet: #a855f7;
+  --color-violet-light: #c084fc;
+
+  --color-orange: #f97316;
+  --color-orange-light: #fb923c;
+
+  --color-amber: #f59e0b;
+  --color-amber-light: #fbbf24;
+
+  --color-green: #22c55e;
+  --color-green-light: #4ade80;
+
+  --color-red: #ef4444;
+  --color-red-light: #f87171;
+
+  /* --------------------------------------------------------------------------
+   * Shadcn semantic tokens — mapped to Molly palette so Base UI components
+   * (Button, Select, Dialog, etc.) automatically pick up the dark theme.
+   * ----------------------------------------------------------------------- */
+  --color-background: var(--color-mol-root);
+  --color-foreground: var(--color-txt-primary);
+
+  --color-card: var(--color-mol-secondary);
+  --color-card-foreground: var(--color-txt-primary);
+
+  --color-popover: var(--color-mol-secondary);
+  --color-popover-foreground: var(--color-txt-primary);
+
+  --color-primary: var(--color-cyan);
+  --color-primary-foreground: var(--color-mol-root);
+
+  --color-secondary: var(--color-mol-tertiary);
+  --color-secondary-foreground: var(--color-txt-primary);
+
+  --color-muted: var(--color-mol-secondary);
+  --color-muted-foreground: var(--color-txt-tertiary);
+
+  --color-accent: var(--color-mol-tertiary);
+  --color-accent-foreground: var(--color-txt-primary);
+
+  --color-destructive: var(--color-red);
+  --color-destructive-foreground: var(--color-txt-primary);
+
+  --color-input: var(--color-border-subtle);
+  --color-ring: var(--color-cyan);
+
+  /* --------------------------------------------------------------------------
+   * Radius — Molly uses sharp/industrial aesthetic, so radius is minimal.
+   * shadcn components reference --radius; keep it small.
+   * ----------------------------------------------------------------------- */
+  --radius: 0.125rem;
+
+  /* --------------------------------------------------------------------------
+   * Typography
+   * ----------------------------------------------------------------------- */
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: "IBM Plex Sans", sans-serif;
+
+  /* --------------------------------------------------------------------------
+   * Animation
+   * ----------------------------------------------------------------------- */
+  --animate-pulse-dot: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-scan-line: scan-line 8s linear infinite;
+  --animate-fade-in: fade-in 200ms ease-out;
 }
+
+/* ============================================================================
+ * Keyframes
+ * ========================================================================= */
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+ * Base layer
+ * ========================================================================= */
 
 @layer base {
   * {
@@ -62,12 +153,14 @@
 
   html {
     @apply font-mono;
+    color-scheme: dark;
   }
 
   body {
-    @apply font-sans antialiased overflow-hidden bg-background text-foreground;
+    @apply font-sans antialiased overflow-hidden bg-mol-root text-txt-primary;
   }
 
+  /* Scrollbar — thin, dark, minimal */
   ::-webkit-scrollbar {
     width: 4px;
     height: 4px;
@@ -80,9 +173,47 @@
   ::-webkit-scrollbar-thumb {
     @apply bg-border;
   }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-strong;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) var(--color-mol-root);
+  }
+
+  /* Native form controls — force dark color scheme so dropdown popups,
+     date pickers, etc. render dark instead of system white. */
+  select,
+  input,
+  textarea,
+  option {
+    color-scheme: dark;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: var(--color-cyan);
+    color: var(--color-mol-root);
+  }
+
+  /* Focus ring — consistent across all interactive elements */
+  :focus-visible {
+    outline: 1px solid var(--color-cyan);
+    outline-offset: 1px;
+  }
 }
 
+/* ============================================================================
+ * Component layer
+ * ========================================================================= */
+
 @layer components {
+  /* --------------------------------------------------------------------------
+   * Panels
+   * ----------------------------------------------------------------------- */
   .panel {
     @apply bg-mol-secondary border border-border-subtle;
   }
@@ -91,27 +222,53 @@
     @apply bg-mol-primary border border-border-subtle;
   }
 
+  /* --------------------------------------------------------------------------
+   * Labels — small uppercase mono headers used everywhere
+   * ----------------------------------------------------------------------- */
   .label {
     @apply text-[10px] font-semibold text-txt-tertiary uppercase tracking-widest font-mono;
   }
 
+  /* --------------------------------------------------------------------------
+   * Buttons (legacy — prefer <Button> from @/components/ui/button for new code)
+   * Kept for compatibility with existing pages until they migrate.
+   * ----------------------------------------------------------------------- */
   .btn {
-    @apply font-mono text-xs font-semibold px-4 py-2 border border-border cursor-pointer transition-all uppercase tracking-wider inline-flex items-center gap-1.5;
+    @apply font-mono text-xs font-semibold px-4 py-2 border cursor-pointer
+           transition-all uppercase tracking-wider inline-flex items-center gap-1.5
+           disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-primary {
-    @apply bg-cyan text-mol-root border-cyan hover:bg-cyan-light disabled:bg-mol-tertiary disabled:text-txt-muted disabled:border-border-subtle disabled:cursor-not-allowed;
+    @apply bg-cyan text-mol-root border-cyan
+           hover:bg-cyan-light
+           disabled:bg-mol-tertiary disabled:text-txt-muted disabled:border-border-subtle;
   }
 
   .btn-danger {
-    @apply bg-red/10 text-red border-red/25 hover:bg-red/20 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply bg-red/10 text-red border-red/25
+           hover:bg-red/20;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-txt-secondary border-border-subtle hover:bg-mol-tertiary hover:text-txt-primary;
+    @apply bg-transparent text-txt-secondary border-border-subtle
+           hover:bg-mol-tertiary hover:text-txt-primary;
   }
 
+  /* --------------------------------------------------------------------------
+   * Native input baseline (legacy — prefer <Input> / <Select> Molly UI primitives)
+   * ----------------------------------------------------------------------- */
   .input-base {
-    @apply font-mono bg-mol-primary border border-border-subtle text-txt-primary text-sm px-3 py-2 outline-none transition-colors focus:border-cyan placeholder:text-txt-muted;
+    @apply font-mono bg-mol-primary border border-border-subtle text-txt-primary
+           text-sm px-3 py-2 outline-none transition-colors
+           focus:border-cyan
+           placeholder:text-txt-muted
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Style native <select> options where browser allows. Most browsers ignore
+     these, which is why Step 8 migrates to Base UI <Select>. */
+  .input-base option {
+    @apply bg-mol-secondary text-txt-primary;
   }
 }
