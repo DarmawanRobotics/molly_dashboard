@@ -7,7 +7,7 @@ import { OccupancyCanvas } from "@/components/map/occupancy-canvas";
 import { useOccupancyGrid } from "@/hooks/use-ros-map";
 import { ros } from "@/lib/ros-bridge";
 import { useRobotStore } from "@/stores/use-robot-store";
-import type { POI } from "@/types";
+import type { POI, MotionAction } from "@/types";
 
 type SlamState = "idle" | "running" | "saving";
 
@@ -73,7 +73,19 @@ export default function MappingPage() {
       setPois((prev) =>
         prev.map((p) =>
           p.id === editingId
-            ? { ...p, ...form, dwellTimeSec: Number(form.dwellTimeSec) }
+            ? {
+                ...p,
+                name: form.name,
+                description: form.description,
+                narrationText: form.narrationText,
+                motionAction: form.motionAction as
+                  | "none"
+                  | "wave"
+                  | "bow"
+                  | "sit"
+                  | "dance",
+                dwellTimeSec: Number(form.dwellTimeSec),
+              }
             : p,
         ),
       );
@@ -81,7 +93,10 @@ export default function MappingPage() {
     } else if (pendingCoord) {
       const poi: POI = {
         id: crypto.randomUUID(),
-        ...form,
+        name: form.name,
+        description: form.description,
+        narrationText: form.narrationText,
+        motionAction: form.motionAction as MotionAction,
         dwellTimeSec: Number(form.dwellTimeSec),
         x: pendingCoord.x,
         y: pendingCoord.y,

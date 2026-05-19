@@ -1,5 +1,3 @@
-// src/types/fsm.ts
-
 /**
  * Finite State Machine state keys for robot lifecycle.
  */
@@ -17,7 +15,7 @@ export type FSMStateKey =
   | "ESTOP";
 
 /**
- * UI metadata for FSM badge rendering.
+ * Visual metadata for rendering FSM state badges.
  */
 export interface FSMStateInfo {
   label: string;
