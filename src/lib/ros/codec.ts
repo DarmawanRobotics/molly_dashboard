@@ -173,3 +173,17 @@ export function downsampleGrid(
 export function rosTimeToMs(t: { sec: number; nanosec: number }): number {
   return t.sec * 1000 + t.nanosec / 1e6;
 }
+
+/**
+ * Extract the 2D ground-plane origin from a ROS OccupancyGrid.
+ *
+ * The ROS spec stores origin as a full Pose with quaternion orientation,
+ * but for 2D rendering we only need the (x, y) translation. This helper
+ * collapses that so canvas code can stay flat.
+ */
+export function gridOrigin2D(grid: OccupancyGrid): { x: number; y: number } {
+  return {
+    x: grid.info.origin.position.x,
+    y: grid.info.origin.position.y,
+  };
+}

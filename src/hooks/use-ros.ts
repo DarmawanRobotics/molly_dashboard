@@ -1,15 +1,16 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { ros } from "@/lib/ros-bridge";
+import { getRos, type TopicDef } from "@/lib/ros";
 import { useRobotStore } from "@/stores/use-robot-store";
 
-/** Connect to rosbridge and sync connection status to Zustand store */
+/** Connect to rosbridge and sync connection status to Zustand store. */
 export function useRosConnection(url: string) {
   const setConnection = useRobotStore((s) => s.setConnection);
 
   useEffect(() => {
     if (!url) return;
-    ros.connect(url);
+    const ros = getRos();
+    ros.connect();
     const unsub = ros.onStatusChange(setConnection);
     return () => {
       unsub();
@@ -17,17 +18,24 @@ export function useRosConnection(url: string) {
   }, [url, setConnection]);
 }
 
-/** Subscribe to a ROS topic */
-export function useRosTopic<T>(topic: string, type: string, initial: T): T {
-  const [data, setData] = useState<T>(initial);
+/**
+ * Subscribe to a typed ROS topic.
+ *
+ * Usage:
+ *   const pose = useRosTopic(TOPICS.ODOM, null);
+ */
+export function useRosTopic<TMsg>(topic: TopicDef<TMsg>, initial: TMsg): TMsg {
+  const [data, setData] = useState<TMsg>(initial);
+
   useEffect(() => {
-    ros.subscribe(topic, type, (msg) => setData(msg as T));
-    return () => ros.unsubscribe(topic);
-  }, [topic, type]);
+    const unsub = getRos().subscribe(topic, setData);
+    return unsub;
+  }, [topic]);
+
   return data;
 }
 
-/** Simulates robot motion for dev (when rosbridge disconnected) */
+/** Simulates robot motion for dev (when rosbridge disconnected). */
 export function useRobotSimulation(active: boolean) {
   const setPose = useRobotStore((s) => s.setPose);
   const pose = useRobotStore((s) => s.pose);
@@ -59,7 +67,7 @@ const FSM_STATES = [
   "PERFORMING",
 ] as const;
 
-/** Simulates FSM state cycling */
+/** Simulates FSM state cycling. */
 export function useFSMSimulation(active: boolean) {
   const setFSM = useRobotStore((s) => s.setFSM);
   const idx = useRef(0);
@@ -74,7 +82,7 @@ export function useFSMSimulation(active: boolean) {
   }, [active, setFSM]);
 }
 
-/** Ticking timer (uptime, tour elapsed, etc.) */
+/** Ticking timer (uptime, tour elapsed, etc.). */
 export function useTicker(active: boolean, start = 0): number {
   const [v, setV] = useState(start);
   useEffect(() => {

@@ -6,22 +6,33 @@ import {
   useRobotSimulation,
   useRosConnection,
 } from "@/hooks/use-ros";
+import { configureRos } from "@/lib/ros";
 import { useRobotStore } from "@/stores/use-robot-store";
 import { useTourStore } from "@/stores/use-tour-store";
+
+const ROSBRIDGE_URL =
+  process.env.NEXT_PUBLIC_ROSBRIDGE_URL ?? "ws://192.168.1.120:9090";
 
 /**
  * Wrap dashboard layout with this to auto-connect rosbridge
  * and run simulation when disconnected.
+ *
+ * NOTE: This provider has 4 concerns (connection + 3 simulations + telemetry +
+ * tour ticker). Step 7 will split it into ConnectionProvider + SimulationLayer.
  */
 export function RosProvider({ children }: { children: React.ReactNode }) {
   const connectionStatus = useRobotStore((s) => s.connectionStatus);
   const isEstop = useRobotStore((s) => s.isEstop);
   const tourActive = useTourStore((s) => s.active);
 
-  // Connect to rosbridge (reads from settings or env)
-  useRosConnection(
-    process.env.NEXT_PUBLIC_ROSBRIDGE_URL || "ws://192.168.1.120:9090",
-  );
+  // Configure singleton with URL once on mount.
+  // configureRos is idempotent for same URL.
+  useEffect(() => {
+    configureRos({ url: ROSBRIDGE_URL });
+  }, []);
+
+  // Connect to rosbridge and sync status to store
+  useRosConnection(ROSBRIDGE_URL);
 
   // Run simulation when not connected to real robot
   const shouldSimulate = connectionStatus === "disconnected" && !isEstop;

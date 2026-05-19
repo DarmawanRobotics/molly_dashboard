@@ -13,7 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { ros } from "@/lib/ros-bridge";
+import { getRos, makeTwist2D, SERVICES, STOP_TWIST, TOPICS } from "@/lib/ros";
 
 function Section({
   icon,
@@ -56,36 +56,34 @@ function Field({
   );
 }
 
-const CMD_VEL = "/cmd_vel";
-const CMD_VEL_TYPE = "geometry_msgs/Twist";
-
-function makeTwist(lx: number, az: number) {
-  return { linear: { x: lx, y: 0, z: 0 }, angular: { x: 0, y: 0, z: az } };
-}
+type TeleopDir = "fwd" | "back" | "left" | "right" | "stop";
 
 export default function SettingsPage() {
   const [linearVel, setLinearVel] = useState(0.3);
   const [angularVel, setAngularVel] = useState(0.5);
-  const [held, setHeld] = useState<string | null>(null);
+  const [held, setHeld] = useState<TeleopDir | null>(null);
 
-  const publish = (key: string) => {
-    const cmds: Record<string, ReturnType<typeof makeTwist>> = {
-      fwd: makeTwist(linearVel, 0),
-      back: makeTwist(-linearVel, 0),
-      left: makeTwist(0, angularVel),
-      right: makeTwist(0, -angularVel),
-      stop: makeTwist(0, 0),
-    };
-    ros.publish(CMD_VEL, CMD_VEL_TYPE, cmds[key] ?? cmds.stop);
+  const publishTeleop = (key: TeleopDir) => {
+    const cmd =
+      key === "fwd"
+        ? makeTwist2D(linearVel, 0)
+        : key === "back"
+          ? makeTwist2D(-linearVel, 0)
+          : key === "left"
+            ? makeTwist2D(0, angularVel)
+            : key === "right"
+              ? makeTwist2D(0, -angularVel)
+              : STOP_TWIST;
+    getRos().publish(TOPICS.CMD_VEL, cmd);
   };
 
-  const startHold = (key: string) => {
+  const startHold = (key: TeleopDir) => {
     setHeld(key);
-    publish(key);
-    const interval = setInterval(() => publish(key), 100);
+    publishTeleop(key);
+    const interval = setInterval(() => publishTeleop(key), 100);
     const stop = () => {
       clearInterval(interval);
-      publish("stop");
+      publishTeleop("stop");
       setHeld(null);
       window.removeEventListener("mouseup", stop);
       window.removeEventListener("touchend", stop);
@@ -100,7 +98,7 @@ export default function SettingsPage() {
     label,
     className = "",
   }: {
-    dir: string;
+    dir: TeleopDir;
     icon: React.ReactNode;
     label: string;
     className?: string;
@@ -177,7 +175,7 @@ export default function SettingsPage() {
                   type="button"
                   aria-label="Stop"
                   title="Stop"
-                  onMouseDown={() => publish("stop")}
+                  onMouseDown={() => publishTeleop("stop")}
                   className="btn btn-danger px-4 py-3 justify-center"
                 >
                   <Square size={16} />
@@ -347,12 +345,15 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={() => {
-                ros
-                  .callService("/nav2_param_server/set_parameters", {
+                getRos()
+                  .callService(SERVICES.SET_NAV2_PARAMS, {
                     max_vel_x: 0.5,
                     max_vel_theta: 1.0,
                   })
-                  .catch(() => {});
+                  .catch((err) => {
+                    // eslint-disable-next-line no-console
+                    console.error("[nav2] set params failed:", err);
+                  });
               }}
               className="btn btn-primary self-start gap-1.5"
             >
@@ -422,9 +423,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() =>
-                    ros.publish("/molly/motion", "std_msgs/String", {
-                      data: motion,
-                    })
+                    getRos().publish(TOPICS.MOTION, { data: motion })
                   }
                   className="btn btn-ghost py-1 px-3 text-[10px]"
                 >

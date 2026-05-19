@@ -5,7 +5,7 @@ import { AppSection } from "@/components/layout/app/section";
 import { AppSidebar } from "@/components/layout/app/sidebar";
 import { OccupancyCanvas } from "@/components/map/occupancy-canvas";
 import { useOccupancyGrid } from "@/hooks/use-ros-map";
-import { ros } from "@/lib/ros-bridge";
+import { getRos, SERVICES, TOPICS } from "@/lib/ros";
 import { useRobotStore } from "@/stores/use-robot-store";
 import type { MotionAction, POI } from "@/types";
 
@@ -16,8 +16,17 @@ interface POIForm {
   description: string;
   dwellTimeSec: number;
   narrationText: string;
-  motionAction: string;
+  motionAction: MotionAction;
 }
+
+const MOTION_ACTIONS: ReadonlyArray<{ value: MotionAction; label: string }> = [
+  { value: "none", label: "No motion" },
+  { value: "wave", label: "Wave" },
+  { value: "bow", label: "Bow" },
+  { value: "sit", label: "Sit" },
+  { value: "stand", label: "Stand" },
+  { value: "dance", label: "Dance" },
+];
 
 const DEFAULT_FORM: POIForm = {
   name: "",
@@ -46,19 +55,23 @@ export default function MappingPage() {
   const handleSlamToggle = () => {
     if (slamState === "idle") {
       setSlamState("running");
-      ros.publish("/slam_toolbox/start_slam", "std_msgs/Empty", {});
+      getRos().publish(TOPICS.SLAM_START, {});
     } else if (slamState === "running") {
       setSlamState("idle");
-      ros.publish("/slam_toolbox/stop_slam", "std_msgs/Empty", {});
+      getRos().publish(TOPICS.SLAM_STOP, {});
     }
   };
 
   const handleSaveMap = () => {
     setSlamState("saving");
-    ros
-      .callService("/slam_toolbox/save_map", { name: `map_${Date.now()}` })
+    getRos()
+      .callService(SERVICES.SAVE_MAP, { name: `map_${Date.now()}` })
       .then(() => setSlamState("idle"))
-      .catch(() => setSlamState("running"));
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error("[slam] save map failed:", err);
+        setSlamState("running");
+      });
   };
 
   const handleMapClick = (_wx: number, _wy: number, gx: number, gy: number) => {
@@ -73,19 +86,7 @@ export default function MappingPage() {
       setPois((prev) =>
         prev.map((p) =>
           p.id === editingId
-            ? {
-                ...p,
-                name: form.name,
-                description: form.description,
-                narrationText: form.narrationText,
-                motionAction: form.motionAction as
-                  | "none"
-                  | "wave"
-                  | "bow"
-                  | "sit"
-                  | "dance",
-                dwellTimeSec: Number(form.dwellTimeSec),
-              }
+            ? { ...p, ...form, dwellTimeSec: Number(form.dwellTimeSec) }
             : p,
         ),
       );
@@ -93,10 +94,7 @@ export default function MappingPage() {
     } else if (pendingCoord) {
       const poi: POI = {
         id: crypto.randomUUID(),
-        name: form.name,
-        description: form.description,
-        narrationText: form.narrationText,
-        motionAction: form.motionAction as MotionAction,
+        ...form,
         dwellTimeSec: Number(form.dwellTimeSec),
         x: pendingCoord.x,
         y: pendingCoord.y,
@@ -261,14 +259,17 @@ export default function MappingPage() {
                     className="input-base flex-1 text-xs"
                     value={form.motionAction}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, motionAction: e.target.value }))
+                      setForm((f) => ({
+                        ...f,
+                        motionAction: e.target.value as MotionAction,
+                      }))
                     }
                   >
-                    <option value="none">No motion</option>
-                    <option value="wave">Wave</option>
-                    <option value="bow">Bow</option>
-                    <option value="sit">Sit</option>
-                    <option value="dance">Dance</option>
+                    {MOTION_ACTIONS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
                   </select>
                   <input
                     type="number"
