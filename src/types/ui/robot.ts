@@ -1,16 +1,8 @@
-/**
- * UI-side aggregated robot runtime state.
- *
- * This is NOT a raw ROS message — it's a denormalized snapshot derived from
- * multiple topics (battery_state, odom, imu, etc.) for easy consumption by
- * dashboard components.
- */
-
 export type GaitMode = "IDLE" | "TROT" | "WALK" | "STANCE" | "CLIMB";
 
 export type SpeedMode = "LOW" | "MEDIUM" | "FAST";
 
-/** 2D pose in map frame (yaw in radians). */
+/** 2D pose in map frame (yaw in radians, position in meters). */
 export interface RobotPose {
   x: number;
   y: number;
@@ -41,7 +33,6 @@ export interface RobotState {
   gait_mode: GaitMode;
   speed_mode: SpeedMode;
 
-  position: RobotPose;
   velocity: RobotVelocity;
   imu: RobotImu;
 

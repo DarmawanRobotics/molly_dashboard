@@ -31,17 +31,11 @@ const DEFAULT_STATE: RobotState = {
   gpu_temp: 38,
 
   gait_mode: "TROT",
+  speed_mode: "MEDIUM",
 
   velocity: {
     linear: 0.35,
     angular: 0.02,
-  },
-  speed_mode: "MEDIUM",
-
-  position: {
-    x: 2.5,
-    y: 1.8,
-    yaw: -0.5,
   },
 
   imu: {
@@ -60,25 +54,37 @@ const DEFAULT_STATE: RobotState = {
 };
 
 /**
+ * Default pose puts the robot near origin (in meters, ROS map frame).
+ * Mock grid is 6m × 5m centered at origin, so (0, 0) shows the robot in
+ * the middle of the visible map.
+ */
+const DEFAULT_POSE: RobotPose = {
+  x: 0,
+  y: 0,
+  yaw: 0,
+};
+
+/**
  * Global robot runtime state store.
+ *
+ * State and pose are kept as separate top-level fields rather than nesting
+ * pose inside state. Reasoning:
+ *   - pose updates at ~10Hz (every /odom message)
+ *   - state updates at ~1Hz (battery, temps, system metrics)
+ *
+ * Putting them together would force any pose-only consumer (e.g. the map
+ * canvas) to re-render on battery percentage changes. With separate fields,
+ * Zustand's selector-based subscription handles them independently.
  */
 export const useRobotStore = create<RobotStore>((set) => ({
   state: DEFAULT_STATE,
-
-  pose: {
-    x: 280,
-    y: 250,
-    yaw: -0.5,
-  },
+  pose: DEFAULT_POSE,
 
   fsmState: "IDLE",
   connectionStatus: "disconnected",
 
   isEstop: false,
 
-  /**
-   * Merge robot telemetry state.
-   */
   setState: (state) =>
     set((prev) => ({
       state: {
@@ -87,24 +93,12 @@ export const useRobotStore = create<RobotStore>((set) => ({
       },
     })),
 
-  /**
-   * Update robot pose.
-   */
   setPose: (pose) => set({ pose }),
 
-  /**
-   * Update FSM state.
-   */
   setFSM: (fsmState) => set({ fsmState }),
 
-  /**
-   * Update websocket/ROS connection state.
-   */
   setConnection: (connectionStatus) => set({ connectionStatus }),
 
-  /**
-   * Toggle emergency stop state.
-   */
   toggleEstop: () =>
     set((prev) => {
       const next = !prev.isEstop;

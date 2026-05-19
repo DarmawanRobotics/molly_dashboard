@@ -20,28 +20,56 @@ export function useRosTopic<TMsg>(topic: TopicDef<TMsg>, initial: TMsg): TMsg {
   return data;
 }
 
-/** Simulates robot motion for dev (when rosbridge disconnected). */
+/* ----------------------------------------------------------------------------
+ * Robot motion simulation
+ *
+ * Simulates a slow random walk in the ROS map frame (meters, not pixels).
+ * Bounds match the mock grid extent so the robot stays visible on the map.
+ * Tick rate is 100ms with ~5cm/step → looks like a robot exploring.
+ * ------------------------------------------------------------------------- */
+
+// Mock grid is 120 × 100 cells at 0.05m/cell with origin (-3, -2.5).
+// World extent: x ∈ [-3, 3], y ∈ [-2.5, 2.5]. We keep the robot a bit
+// inside that so it doesn't get clipped to the edge.
+const SIM_BOUNDS = {
+  minX: -2.5,
+  maxX: 2.5,
+  minY: -2.0,
+  maxY: 2.0,
+};
+
+const SIM_STEP_METERS = 0.05;
+const SIM_YAW_JITTER = 0.06; // radians per tick
+
 export function useRobotSimulation(active: boolean) {
   const setPose = useRobotStore((s) => s.setPose);
-  const pose = useRobotStore((s) => s.pose);
-  const yawRef = useRef(pose.yaw);
 
   useEffect(() => {
     if (!active) return;
-    const i = setInterval(() => {
-      yawRef.current += (Math.random() - 0.5) * 0.06;
-      const x = Math.max(
-        60,
-        Math.min(620, pose.x + Math.cos(yawRef.current) * 0.5),
-      );
-      const y = Math.max(
-        100,
-        Math.min(400, pose.y + Math.sin(yawRef.current) * 0.5),
-      );
-      setPose({ x, y, yaw: yawRef.current });
+
+    const id = setInterval(() => {
+      const pose = useRobotStore.getState().pose;
+      const yaw = pose.yaw + (Math.random() - 0.5) * SIM_YAW_JITTER;
+      let x = pose.x + Math.cos(yaw) * SIM_STEP_METERS;
+      let y = pose.y + Math.sin(yaw) * SIM_STEP_METERS;
+
+      // Reflect at bounds rather than clamping — clamped robot would hug
+      // the wall forever. Reflection makes it wander back into view.
+      let nextYaw = yaw;
+      if (x < SIM_BOUNDS.minX || x > SIM_BOUNDS.maxX) {
+        x = Math.max(SIM_BOUNDS.minX, Math.min(SIM_BOUNDS.maxX, x));
+        nextYaw = Math.PI - yaw;
+      }
+      if (y < SIM_BOUNDS.minY || y > SIM_BOUNDS.maxY) {
+        y = Math.max(SIM_BOUNDS.minY, Math.min(SIM_BOUNDS.maxY, y));
+        nextYaw = -yaw;
+      }
+
+      setPose({ x, y, yaw: nextYaw });
     }, 100);
-    return () => clearInterval(i);
-  }, [active, pose, setPose]);
+
+    return () => clearInterval(id);
+  }, [active, setPose]);
 }
 
 const FSM_STATES = [
