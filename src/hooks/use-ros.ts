@@ -3,26 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { getRos, type TopicDef } from "@/lib/ros";
 import { useRobotStore } from "@/stores/use-robot-store";
 
-/** Connect to rosbridge and sync connection status to Zustand store. */
-export function useRosConnection(url: string) {
-  const setConnection = useRobotStore((s) => s.setConnection);
-
-  useEffect(() => {
-    if (!url) return;
-    const ros = getRos();
-    ros.connect();
-    const unsub = ros.onStatusChange(setConnection);
-    return () => {
-      unsub();
-    };
-  }, [url, setConnection]);
-}
-
 /**
  * Subscribe to a typed ROS topic.
  *
  * Usage:
- *   const pose = useRosTopic(TOPICS.ODOM, null);
+ *   const odom = useRosTopic(TOPICS.ODOM, null);
  */
 export function useRosTopic<TMsg>(topic: TopicDef<TMsg>, initial: TMsg): TMsg {
   const [data, setData] = useState<TMsg>(initial);
