@@ -7,7 +7,7 @@ import { OccupancyCanvas } from "@/components/map/occupancy-canvas";
 import { useOccupancyGrid } from "@/hooks/use-ros-map";
 import { getRos, SERVICES, TOPICS } from "@/lib/ros";
 import { useRobotStore } from "@/stores/use-robot-store";
-import type { MotionAction, POI } from "@/types";
+import type { MotionAction, OccupancyGrid, POI } from "@/types";
 
 type SlamState = "idle" | "running" | "saving";
 
@@ -35,6 +35,18 @@ const DEFAULT_FORM: POIForm = {
   narrationText: "",
   motionAction: "none",
 };
+
+/** Convert world coords (meters) → grid cell indices using the grid's origin. */
+function worldToCell(
+  world: { x: number; y: number },
+  grid: OccupancyGrid,
+): { x: number; y: number } {
+  const { resolution, origin } = grid.info;
+  return {
+    x: Math.floor((world.x - origin.position.x) / resolution),
+    y: Math.floor((world.y - origin.position.y) / resolution),
+  };
+}
 
 export default function MappingPage() {
   const connectionStatus = useRobotStore((s) => s.connectionStatus);
@@ -74,10 +86,19 @@ export default function MappingPage() {
       });
   };
 
-  const handleMapClick = (_wx: number, _wy: number, gx: number, gy: number) => {
-    if (!addMode) return;
-    setPendingCoord({ x: gx, y: gy });
+  /**
+   * OccupancyCanvas now emits world coords (meters). We convert to grid cells
+   * here because POI.x/y are stored as cell indices throughout the app.
+   */
+  const handleMapClick = (world: { x: number; y: number }) => {
+    if (!addMode || !grid) return;
+    const cell = worldToCell(world, grid);
+    setPendingCoord(cell);
     setAddMode(false);
+  };
+
+  const handlePoiClick = (poi: POI) => {
+    setSelectedPoi(poi.id === selectedPoi ? null : poi.id);
   };
 
   const handleSavePoi = () => {
@@ -134,8 +155,10 @@ export default function MappingPage() {
               grid={grid}
               pose={pose}
               pois={pois}
-              activePoi={selectedPoi}
+              activePoiId={selectedPoi}
+              showPoiLabels
               onMapClick={addMode ? handleMapClick : undefined}
+              onPoiClick={handlePoiClick}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -388,7 +411,6 @@ export default function MappingPage() {
           </div>
         </AppSection>
 
-        {/* Saved Maps */}
         <AppSection title="Saved Maps">
           <div className="text-xs text-txt-muted text-center py-4">
             No saved maps — save after SLAM

@@ -100,7 +100,7 @@ export default function MonitorPage() {
               grid={grid}
               pose={pose}
               pois={MOCK_POIS}
-              activePoi={activePoi}
+              activePoiId={activePoi}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
