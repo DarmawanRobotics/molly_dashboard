@@ -9,13 +9,11 @@
  * app bootstrap (e.g. in the ConnectionProvider).
  */
 
+import { env } from "../env";
 import { type ClientConfig, RosClient } from "./client";
 
 let instance: RosClient | null = null;
 let currentConfig: ClientConfig | null = null;
-
-const DEFAULT_URL =
-  process.env.NEXT_PUBLIC_ROSBRIDGE_URL ?? "ws://localhost:9090";
 
 /**
  * Initialize or reconfigure the singleton client.
@@ -24,7 +22,7 @@ const DEFAULT_URL =
  * existing instance and create a new one. Subscribers must re-subscribe.
  */
 export function configureRos(config: Partial<ClientConfig> = {}): RosClient {
-  const url = config.url ?? currentConfig?.url ?? DEFAULT_URL;
+  const url = config.url ?? currentConfig?.url ?? env.ROSBRIDGE_URL;
   const next: ClientConfig = { ...currentConfig, ...config, url };
 
   if (instance && currentConfig?.url === url) {

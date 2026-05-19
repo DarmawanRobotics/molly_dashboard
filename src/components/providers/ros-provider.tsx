@@ -6,12 +6,10 @@ import {
   useRobotSimulation,
   useRosConnection,
 } from "@/hooks/use-ros";
+import { env } from "@/lib/env";
 import { configureRos } from "@/lib/ros";
 import { useRobotStore } from "@/stores/use-robot-store";
 import { useTourStore } from "@/stores/use-tour-store";
-
-const ROSBRIDGE_URL =
-  process.env.NEXT_PUBLIC_ROSBRIDGE_URL ?? "ws://192.168.1.120:9090";
 
 /**
  * Wrap dashboard layout with this to auto-connect rosbridge
@@ -28,11 +26,11 @@ export function RosProvider({ children }: { children: React.ReactNode }) {
   // Configure singleton with URL once on mount.
   // configureRos is idempotent for same URL.
   useEffect(() => {
-    configureRos({ url: ROSBRIDGE_URL });
+    configureRos({ url: env.ROSBRIDGE_URL });
   }, []);
 
   // Connect to rosbridge and sync status to store
-  useRosConnection(ROSBRIDGE_URL);
+  useRosConnection(env.ROSBRIDGE_URL);
 
   // Run simulation when not connected to real robot
   const shouldSimulate = connectionStatus === "disconnected" && !isEstop;
