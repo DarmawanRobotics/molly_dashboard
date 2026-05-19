@@ -75,7 +75,7 @@ const MOCK_POIS: POI[] = [
 export default function MonitorPage() {
   const pose = useRobotStore((s) => s.pose);
   const connectionStatus = useRobotStore((s) => s.connectionStatus);
-  const activePoi = useTourStore((s) => s.activePoi);
+  const activePoiId = useTourStore((s) => s.activePoiId);
   const grid = useOccupancyGrid(connectionStatus === "disconnected");
 
   return (
@@ -100,7 +100,7 @@ export default function MonitorPage() {
               grid={grid}
               pose={pose}
               pois={MOCK_POIS}
-              activePoiId={activePoi}
+              activePoiId={activePoiId}
             />
           ) : (
             <div className="flex items-center justify-center h-full">

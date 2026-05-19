@@ -1,22 +1,14 @@
 "use client";
 
-import { type ReactNode, useEffect } from "react";
-import { useTourStore } from "@/stores/use-tour-store";
-
-const TICK_MS = 1000;
+import type { ReactNode } from "react";
 
 /**
- * Increments the tour `elapsed` counter once per second when a tour is
- * active. Lives in its own component so re-renders from tour state changes
- * don't ripple into the rest of the provider tree.
+ * @deprecated The 1Hz `elapsed` ticker has moved into `useTourController`.
+ * This component is kept only so `app-providers.tsx` doesn't need a
+ * coordinated edit in the same commit. It passes children through unchanged.
+ *
+ * Remove in the next refactor pass once app-providers no longer imports it.
  */
 export function TourTicker({ children }: { children: ReactNode }) {
-  const tick = useTourStore((s) => s.tick);
-
-  useEffect(() => {
-    const id = setInterval(tick, TICK_MS);
-    return () => clearInterval(id);
-  }, [tick]);
-
   return <>{children}</>;
 }

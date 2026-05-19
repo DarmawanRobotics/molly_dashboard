@@ -1,17 +1,9 @@
-/**
- * Typed registry of ROS topics and services used by the dashboard.
- *
- * Centralizing topic names + types here means:
- *   - one place to update when the robot side renames anything
- *   - subscribe/publish call sites get full type inference
- *   - no string typos silently breaking subscriptions
- *
- * Naming convention follows ROS 2: `package_name/msg/Type`.
- * If your rosbridge build still uses ROS 1 style (`package_name/Type`), update
- * the `type` strings here only; call sites stay the same.
- */
-
 import type { Twist } from "@/types/ros/geometry";
+import type {
+  GetTourStateResponseWire,
+  TourCommandWire,
+  TourStateWire,
+} from "@/types/ros/molly";
 import type { OccupancyGrid, Odometry } from "@/types/ros/nav";
 import type { BatteryState, CompressedImage, Imu } from "@/types/ros/sensor";
 import type { StdEmpty, StdString } from "@/types/ros/std";
@@ -62,6 +54,10 @@ export const TOPICS = {
   // SLAM control
   SLAM_START: topic<StdEmpty>("/slam_toolbox/start_slam", "std_msgs/msg/Empty"),
   SLAM_STOP: topic<StdEmpty>("/slam_toolbox/stop_slam", "std_msgs/msg/Empty"),
+
+  // Tour FSM (robot-side authority)
+  TOUR_CMD: topic<TourCommandWire>("/tour/cmd", "molly_msgs/msg/TourCommand"),
+  TOUR_STATE: topic<TourStateWire>("/tour/state", "molly_msgs/msg/TourState"),
 } as const;
 
 export type TopicKey = keyof typeof TOPICS;
@@ -100,6 +96,15 @@ export const SERVICES = {
   SET_NAV2_PARAMS: service<Record<string, unknown>, { result: boolean }>(
     "/nav2_param_server/set_parameters",
     "rcl_interfaces/srv/SetParameters",
+  ),
+
+  /**
+   * Snapshot of current tour state. Called by useTourController on (re)connect
+   * to bootstrap UI before topic subscription delivers the first event.
+   */
+  TOUR_GET_STATE: service<Record<string, never>, GetTourStateResponseWire>(
+    "/tour/get_state",
+    "molly_msgs/srv/GetTourState",
   ),
 } as const;
 
