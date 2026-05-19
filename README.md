@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Molly Dashboard
 
-## Getting Started
+Operator console for the **Molly** tour-guide robot (Unitree Lite3 Venture, ROS 2 Humble). Built with Next.js 16, React 19, and Tailwind v4.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+┌─────────────────────────────────────┐
+│  Dashboard (this repo)              │
+│  ┌─ /monitor    live feed + tour    │
+│  ├─ /mapping    SLAM + POI editor   │
+│  ├─ /system     logs + resources    │
+│  └─ /settings   teleop + connection │
+└──────────────┬──────────────────────┘
+               │  rosbridge_suite (WebSocket)
+               ▼
+┌─────────────────────────────────────┐
+│  Robot (Jetson Orin NX)             │
+│  nav2, slam_toolbox, tour_fsm,      │
+│  unitree_*, etc.                    │
+└─────────────────────────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick Start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+cp .env.example .env  # then edit ROSBRIDGE_URL
+pnpm dev              # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Robot offline? Set `NEXT_PUBLIC_USE_MOCKS=true` — dashboard runs against synthetic data.
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — module layout, data flow, FSM design
+- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — local setup, mocks, debugging
+- **[docs/ROBOT-SIDE.md](docs/ROBOT-SIDE.md)** — what the ROS workspace needs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Route | Purpose |
+|---|---|
+| `/monitor` | Live camera, tour control, robot status, LLM conversation |
+| `/mapping` | SLAM run + save, POI placement + editing |
+| `/system` | Resource monitor, ROS node status, log viewer |
+| `/settings` | Teleop, connection URLs, Nav2 params, LLM config |
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16 (App Router, React 19) |
+| Styling | Tailwind v4 with `@theme` design tokens |
+| UI primitives | Base UI (`@base-ui/react`) wrapped as Molly components |
+| State | Zustand (one store per domain) |
+| ROS integration | Custom `RosClient` over rosbridge_suite WebSocket |
+| Lint + format | Biome 2 |
+| Git hooks | Lefthook |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+```bash
+pnpm dev          # dev server
+pnpm build        # production build
+pnpm lint         # biome check
+pnpm lint:fix     # biome check + auto-fix
+pnpm type-check   # tsc --noEmit
+pnpm check        # lint + type-check + build (CI mirror)
+```
+
+## License
+
+MIT
