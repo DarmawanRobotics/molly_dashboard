@@ -2,6 +2,7 @@
 
 import { Radio, Save } from "lucide-react";
 import { useState } from "react";
+import { toast } from "@/components/feedback";
 import { MollyButton, MollyField, MollyInput } from "@/components/ui/molly";
 import { configureRos, getRos } from "@/lib/ros";
 import { useSettingsStore } from "@/stores/use-settings-store";
@@ -28,6 +29,7 @@ export function ConnectionSection() {
     // Tear down + rebuild the singleton with new URL
     configureRos({ url: draftRos });
     getRos().connect();
+    toast.info("Reconnecting…", draftRos);
   };
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { Compass, Save } from "lucide-react";
+import { toast } from "@/components/feedback";
 import {
   MollyButton,
   MollyField,
@@ -29,9 +30,16 @@ export function Nav2Section() {
         planner: nav2.planner,
         controller: nav2.controller,
       })
+      .then(() => {
+        toast.success("Nav2 parameters applied");
+      })
       .catch((err) => {
         // eslint-disable-next-line no-console
         console.error("[nav2] set params failed:", err);
+        toast.error(
+          "Failed to apply Nav2 params",
+          err instanceof Error ? err.message : String(err),
+        );
       });
   };
 

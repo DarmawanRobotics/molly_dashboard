@@ -19,8 +19,15 @@ function Stat({
   return (
     <div className="panel-inset px-3 py-2.5">
       <div className="flex items-center gap-1.5 mb-1">
-        <span className="text-txt-muted">{icon}</span>
-        <span className="label">{label}</span>
+        <span aria-hidden className="text-txt-muted">
+          {icon}
+        </span>
+        <span
+          className="label"
+          id={`stat-${label.toLowerCase().replace(/\s+/g, "-")}`}
+        >
+          {label}
+        </span>
       </div>
       <span className={cn("font-mono text-base font-bold", color)}>
         {value}
@@ -84,8 +91,10 @@ export function RobotStatus() {
       {/* 4. SPEED */}
       <div className="panel-inset px-3 py-2">
         <div className="flex items-center gap-1.5 mb-1">
-          <Gauge size={13} className="text-txt-muted" />
-          <span className="label">Speed</span>
+          <Gauge size={13} aria-hidden className="text-txt-muted" />
+          <span className="label" id="stat-speed">
+            Speed
+          </span>
         </div>
 
         <div className="font-mono text-base font-bold text-cyan-300">
@@ -96,18 +105,27 @@ export function RobotStatus() {
       {/* 5. FSM */}
       <div className="panel-inset px-3 py-2">
         <div className="flex items-center gap-1.5 mb-2">
-          <Activity size={13} className="text-txt-muted" />
-          <span className="label">FSM State</span>
+          <Activity size={13} aria-hidden className="text-txt-muted" />
+          <span className="label" id="stat-fsm">
+            FSM State
+          </span>
         </div>
 
         <div
+          aria-live="polite"
           className={cn(
             "flex items-center gap-2 border px-2.5 py-1 w-full",
             fsm.bgClass,
             fsm.borderClass,
           )}
         >
-          <div className={cn("h-2 w-2 animate-pulse-dot", fsm.dotClass)} />
+          <div
+            aria-hidden
+            className={cn(
+              "h-2 w-2 motion-safe:animate-pulse-dot",
+              fsm.dotClass,
+            )}
+          />
           <span
             className={cn("font-mono text-xs font-semibold", fsm.textClass)}
           >

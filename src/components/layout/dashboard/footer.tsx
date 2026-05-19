@@ -14,7 +14,7 @@ export function Footer() {
     connectionStatus === "connected"
       ? "bg-green"
       : connectionStatus === "reconnecting"
-        ? "bg-amber"
+        ? "bg-amber motion-safe:animate-pulse"
         : "bg-red";
 
   const textClass =
@@ -28,7 +28,10 @@ export function Footer() {
     <footer className="flex h-7 shrink-0 items-center justify-between border-t border-border-subtle bg-mol-primary px-4 font-mono text-[10px] text-txt-muted">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
-          <div className={cn("h-1.5 w-1.5 rounded-full", dotClass)} />
+          <div
+            aria-hidden
+            className={cn("h-1.5 w-1.5 rounded-full", dotClass)}
+          />
           <span className={textClass}>{connectionStatus}</span>
         </div>
 

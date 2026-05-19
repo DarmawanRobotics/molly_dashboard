@@ -2,6 +2,7 @@
 
 import { Navigation, Save } from "lucide-react";
 import { useState } from "react";
+import { toast } from "@/components/feedback";
 import { AppSection } from "@/components/layout/app/section";
 import { MollyButton } from "@/components/ui/molly/button";
 import { getRos, SERVICES, TOPICS } from "@/lib/ros";
@@ -21,21 +22,31 @@ export function SlamControl() {
     if (slamState === "idle") {
       setSlamState("running");
       getRos().publish(TOPICS.SLAM_START, {});
+      toast.info("SLAM started", "Drive the robot to map the area");
     } else if (slamState === "running") {
       setSlamState("idle");
       getRos().publish(TOPICS.SLAM_STOP, {});
+      toast.info("SLAM stopped");
     }
   };
 
   const handleSave = () => {
     setSlamState("saving");
+    const name = `map_${Date.now()}`;
     getRos()
-      .callService(SERVICES.SAVE_MAP, { name: `map_${Date.now()}` })
-      .then(() => setSlamState("idle"))
+      .callService(SERVICES.SAVE_MAP, { name })
+      .then(() => {
+        setSlamState("idle");
+        toast.success("Map saved", name);
+      })
       .catch((err) => {
         // eslint-disable-next-line no-console
         console.error("[slam] save map failed:", err);
         setSlamState("running");
+        toast.error(
+          "Failed to save map",
+          err instanceof Error ? err.message : String(err),
+        );
       });
   };
 
@@ -70,13 +81,17 @@ export function SlamControl() {
         </div>
         <div className="panel-inset px-3 py-2 flex items-center gap-2">
           <div
+            aria-hidden
             className={`w-2 h-2 rounded-full ${
               slamState === "running"
-                ? "bg-green animate-pulse"
+                ? "bg-green motion-safe:animate-pulse"
                 : "bg-txt-muted"
             }`}
           />
-          <span className="font-mono text-xs text-txt-secondary">
+          <span
+            aria-live="polite"
+            className="font-mono text-xs text-txt-secondary"
+          >
             {statusLabel}
           </span>
         </div>

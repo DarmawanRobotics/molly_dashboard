@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
-
 @import "tailwindcss";
 
 /* ============================================================================
@@ -70,6 +68,7 @@
   --animate-pulse-dot: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-scan-line: scan-line 8s linear infinite;
   --animate-fade-in: fade-in 200ms ease-out;
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
 }
 
 /* ============================================================================
@@ -103,6 +102,12 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }
 
@@ -162,6 +167,21 @@
     outline: 1px solid var(--color-cyan);
     outline-offset: 1px;
   }
+
+  /*
+   * Reduced motion — respect operating-system "reduce motion" setting.
+   * Disables pulses, shimmers, scans, and other looping animations.
+   * Fades and one-shot transitions still play (they're brief and informative).
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 }
 
 /* ============================================================================
@@ -213,5 +233,17 @@
 
   .input-base option {
     @apply bg-mol-secondary text-txt-primary;
+  }
+
+  /*
+   * Skip-link — visually hidden until focused. Keyboard users tab into it
+   * first thing on page load and can jump past the chrome to main content.
+   * Screen readers always announce it.
+   */
+  .skip-link {
+    @apply absolute left-2 top-2 z-50 px-3 py-1.5 font-mono text-xs font-semibold
+           bg-cyan text-mol-root border border-cyan
+           -translate-y-20 focus:translate-y-0
+           transition-transform;
   }
 }
