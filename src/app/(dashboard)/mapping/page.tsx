@@ -7,7 +7,7 @@ import { OccupancyCanvas } from "@/components/map/occupancy-canvas";
 import { useOccupancyGrid } from "@/hooks/use-ros-map";
 import { ros } from "@/lib/ros-bridge";
 import { useRobotStore } from "@/stores/use-robot-store";
-import type { POI, MotionAction } from "@/types";
+import type { MotionAction, POI } from "@/types";
 
 type SlamState = "idle" | "running" | "saving";
 
