@@ -7,7 +7,7 @@ import {
   SkipForward,
   Square,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MollyButton } from "@/components/ui/molly";
 import { useTourStore } from "@/stores/use-tour-store";
 import type { POI } from "@/types";
 
@@ -28,26 +28,26 @@ export function TourControl({ pois }: Props) {
 
   return (
     <div className="flex flex-col gap-2.5">
-      {/* ACTION BUTTONS */}
+      {/* ACTION MollyButtonS */}
       <div className="flex gap-1.5">
-        <Button onClick={handleStart} disabled={active} className="flex-1">
+        <MollyButton onClick={handleStart} disabled={active} className="flex-1">
           <Play size={14} />
           Start
-        </Button>
+        </MollyButton>
 
-        <Button
+        <MollyButton
           onClick={stop}
           disabled={!active}
-          variant="destructive"
+          variant="danger"
           className="flex-1"
         >
           <Square size={14} />
           Stop
-        </Button>
+        </MollyButton>
       </div>
 
       <div className="flex gap-1.5">
-        <Button
+        <MollyButton
           onClick={handleRestart}
           disabled={!active}
           variant="secondary"
@@ -55,9 +55,9 @@ export function TourControl({ pois }: Props) {
         >
           <RotateCcw size={12} />
           Restart
-        </Button>
+        </MollyButton>
 
-        <Button
+        <MollyButton
           onClick={handleNext}
           disabled={!active}
           variant="secondary"
@@ -65,7 +65,7 @@ export function TourControl({ pois }: Props) {
         >
           <SkipForward size={12} />
           Next WP
-        </Button>
+        </MollyButton>
       </div>
 
       {/* WAYPOINT LIST */}
