@@ -1,5 +1,5 @@
-import type { RobotPose } from "@/types/ui";
 import type { OccupancyGrid } from "@/types/ros";
+import type { RobotPose } from "@/types/ui";
 import { PALETTE } from "../palette";
 import { project, type Viewport } from "../projection";
 
