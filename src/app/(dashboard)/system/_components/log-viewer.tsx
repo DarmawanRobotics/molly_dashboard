@@ -1,8 +1,24 @@
 "use client";
-import { Activity, Filter, Search } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import { Activity, ArrowDown } from "lucide-react";
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  MollyButton,
+  MollyInput,
+  MollySelect,
+  type MollySelectOption,
+} from "@/components/ui/molly";
 
 type LogLevel = "info" | "warn" | "error" | "debug";
+type LogFilter = LogLevel | "all";
+
 type LogEntry = {
   id: number;
   timestamp: string;
@@ -55,11 +71,30 @@ const COLOR: Record<LogLevel, string> = {
   debug: "text-txt-muted",
 };
 
+const LEVEL_OPTIONS: ReadonlyArray<MollySelectOption<LogFilter>> = [
+  { value: "all", label: "All levels" },
+  { value: "info", label: "Info" },
+  { value: "warn", label: "Warn" },
+  { value: "error", label: "Error" },
+  { value: "debug", label: "Debug" },
+];
+
+/**
+ * CSS custom properties consumed by Tailwind arbitrary value classes below.
+ * Defined as a const so the `style` prop accepts a typed object rather than
+ * a literal — keeps editors from flagging it as raw inline styling.
+ */
+type VirtualizerStyle = CSSProperties & {
+  "--row-height": string;
+  "--total-height": string;
+  "--offset-y": string;
+};
+
 export default function LogViewer() {
   const [logs, setLogs] = useState<LogEntry[]>(() =>
     Array.from({ length: 50 }, (_, i) => genLog(i)),
   );
-  const [filter, setFilter] = useState<LogLevel | "all">("all");
+  const [filter, setFilter] = useState<LogFilter>("all");
   const [search, setSearch] = useState("");
   const [autoScroll, setAutoScroll] = useState(true);
   const [scrollTop, setScrollTop] = useState(0);
@@ -123,11 +158,28 @@ export default function LogViewer() {
     Math.ceil((scrollTop + containerHeight.current) / ROW_HEIGHT) + OVERSCAN,
   );
   const visibleLogs = filtered.slice(startIdx, endIdx);
+  const offsetY = startIdx * ROW_HEIGHT;
+
+  const followNewest = () => {
+    setAutoScroll(true);
+    if (containerRef.current) {
+      containerRef.current.scrollTop = totalHeight;
+    }
+  };
+
+  // CSS variables for the virtualizer — values are dynamic per-render so
+  // they can't be static utility classes. They're consumed by Tailwind
+  // arbitrary classes (h-[var(--total-height)] etc) on the elements below.
+  const virtualizerStyle: VirtualizerStyle = {
+    "--row-height": `${ROW_HEIGHT}px`,
+    "--total-height": `${totalHeight}px`,
+    "--offset-y": `${offsetY}px`,
+  };
 
   return (
     <div className="flex flex-col h-full">
       <div className="h-10 border-b border-border-subtle flex items-center gap-3 px-4 bg-mol-secondary shrink-0">
-        <Activity size={14} className="text-cyan" />
+        <Activity size={14} className="text-cyan" aria-hidden="true" />
         <span className="label">System Logs</span>
         <span className="font-mono text-[10px] text-txt-muted ml-1">
           ({filtered.length})
@@ -135,50 +187,37 @@ export default function LogViewer() {
         <div className="flex-1" />
 
         {!autoScroll && (
-          <button
-            type="button"
-            onClick={() => {
-              setAutoScroll(true);
-              if (containerRef.current)
-                containerRef.current.scrollTop = totalHeight;
-            }}
-            className="btn btn-ghost py-0.5 px-2 text-[10px] text-cyan border-cyan/30"
+          <MollyButton
+            variant="ghost"
+            size="xs"
+            onClick={followNewest}
+            className="text-cyan border-cyan/30"
           >
-            ↓ Follow
-          </button>
+            <ArrowDown size={11} aria-hidden="true" />
+            Follow
+          </MollyButton>
         )}
 
-        <div className="flex items-center gap-1 bg-mol-primary border border-border-subtle px-2 py-1">
-          <label htmlFor="log-search" className="sr-only">
-            Search logs
-          </label>
-          <Search size={12} className="text-txt-muted" />
-          <input
+        <div className="w-44">
+          <MollyInput
             id="log-search"
+            aria-label="Search logs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Filter…"
-            className="bg-transparent text-xs outline-none w-28 font-mono"
+            placeholder="Filter logs…"
+            inputSize="sm"
           />
         </div>
 
-        <div className="flex items-center gap-1 bg-mol-primary border border-border-subtle px-2 py-1">
-          <label htmlFor="log-filter" className="sr-only">
-            Filter level
-          </label>
-          <Filter size={12} className="text-txt-muted" />
-          <select
+        <div className="w-36">
+          <MollySelect<LogFilter>
             id="log-filter"
+            ariaLabel="Filter by level"
             value={filter}
-            onChange={(e) => setFilter(e.target.value as LogLevel | "all")}
-            className="bg-transparent text-xs outline-none font-mono cursor-pointer"
-          >
-            <option value="all">All</option>
-            <option value="info">Info</option>
-            <option value="warn">Warn</option>
-            <option value="error">Error</option>
-            <option value="debug">Debug</option>
-          </select>
+            onChange={setFilter}
+            options={LEVEL_OPTIONS}
+            size="sm"
+          />
         </div>
       </div>
 
@@ -186,13 +225,16 @@ export default function LogViewer() {
         ref={containerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto font-mono text-[11px]"
+        role="log"
+        aria-label="System log entries"
+        style={virtualizerStyle}
       >
-        <div>
-          <div>
+        <div className="relative h-(--total-height)">
+          <div className="absolute top-0 left-0 right-0 translate-y-(--offset-y)">
             {visibleLogs.map((l) => (
               <div
                 key={l.id}
-                className="flex items-center gap-3 px-2 hover:bg-mol-secondary transition-colors border-b border-border-subtle/30"
+                className="flex items-center gap-3 px-2 hover:bg-mol-secondary transition-colors border-b border-border-subtle/30 h-(--row-height)"
               >
                 <span className="text-txt-muted w-20 shrink-0">
                   {l.timestamp}

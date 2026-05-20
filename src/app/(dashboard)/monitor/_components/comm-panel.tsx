@@ -2,6 +2,7 @@
 
 import { Mic, MicOff, Send } from "lucide-react";
 import { useRef, useState } from "react";
+import { MollyButton, MollyTextarea } from "@/components/ui/molly";
 import { useCommsStore } from "@/stores/use-comms-store";
 
 export function CommsPanel() {
@@ -31,12 +32,13 @@ export function CommsPanel() {
   return (
     <div className="flex flex-col gap-2">
       <div className="relative flex gap-1.5">
-        <textarea
+        <MollyTextarea
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={sttActive ? "Listening via STT..." : "Send command..."}
-          className="input-base flex-1 text-xs resize-none min-h-15 max-h-30 pr-10"
+          placeholder={sttActive ? "Listening via STT…" : "Send command…"}
+          aria-label="Operator command input"
+          className="flex-1 text-xs min-h-15 max-h-30 pr-10"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -45,36 +47,36 @@ export function CommsPanel() {
           }}
         />
 
-        <button
+        <MollyButton
+          variant="primary"
+          size="xs"
           onClick={send}
           disabled={!input.trim()}
-          className="absolute bottom-2 right-2 btn btn-primary px-2 py-1"
-          type="button"
-          title="Send command"
+          aria-label="Send command"
+          title="Send command (Enter)"
+          className="absolute bottom-2 right-2"
         >
-          <Send size={13} />
-        </button>
+          <Send size={13} aria-hidden="true" />
+        </MollyButton>
       </div>
 
-      <button
+      <MollyButton
+        variant={sttActive ? "danger" : "ghost"}
         onClick={toggleSTT}
-        type="button"
-        className={`btn w-full justify-center py-2 transition-colors ${
-          sttActive
-            ? "bg-red/10 text-red border-red/25 animate-pulse"
-            : "btn-ghost"
+        className={`w-full justify-center ${
+          sttActive ? "motion-safe:animate-pulse" : ""
         }`}
       >
         {sttActive ? (
           <>
-            <MicOff size={13} /> Listening (STT Active)
+            <MicOff size={13} aria-hidden="true" /> Listening (STT Active)
           </>
         ) : (
           <>
-            <Mic size={13} /> Enable Voice Input
+            <Mic size={13} aria-hidden="true" /> Enable Voice Input
           </>
         )}
-      </button>
+      </MollyButton>
     </div>
   );
 }

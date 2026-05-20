@@ -169,16 +169,28 @@
   }
 
   /*
-   * Reduced motion — respect operating-system "reduce motion" setting.
-   * Disables pulses, shimmers, scans, and other looping animations.
-   * Fades and one-shot transitions still play (they're brief and informative).
+   * Reduced motion — respects the operating-system "reduce motion" setting.
+   *
+   * Disables pulses, shimmers, scans, and other looping animations across
+   * the entire component tree. Fades and one-shot transitions still play
+   * (they're brief and informative).
+   *
+   * `!important` is intentional here: the rules must beat every
+   * component-level animation/transition declaration, including those set
+   * inline by libraries (Base UI, Tailwind's `animate-*` utilities, etc.).
+   * Without it, a more specific selector elsewhere would override the
+   * accessibility preference.
    */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
+      /* biome-ignore lint/complexity/noImportantStyles: required to beat all
+         component-level animation declarations for a11y override */
       animation-duration: 0.001ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: see above */
       animation-iteration-count: 1 !important;
+      /* biome-ignore lint/complexity/noImportantStyles: see above */
       transition-duration: 0.001ms !important;
     }
   }
