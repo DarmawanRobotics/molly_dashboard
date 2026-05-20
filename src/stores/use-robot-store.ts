@@ -30,7 +30,7 @@ const DEFAULT_STATE: RobotState = {
   cpu_temp: 42,
   gpu_temp: 38,
 
-  gait_mode: "TROT",
+  gait_mode: "STANDARD",
   speed_mode: "MEDIUM",
 
   velocity: {

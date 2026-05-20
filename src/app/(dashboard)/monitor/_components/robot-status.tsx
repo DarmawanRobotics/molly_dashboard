@@ -43,11 +43,10 @@ export function RobotStatus() {
   const fsm = FSM_STATES[fsmState];
 
   const gaitModeStyle: Record<string, string> = {
-    IDLE: "text-zinc-400",
-    STANCE: "text-green-400",
-    WALK: "text-cyan-400",
-    TROT: "text-yellow-300",
-    CLIMB: "text-purple-300",
+    STANDAR: "text-blue-400",
+    CRAWL: "text-orange-400",
+    "H-STEP": "text-pink-400",
+    STAIR: "text-purple-400",
   };
 
   const speedModeColor: Record<string, string> = {

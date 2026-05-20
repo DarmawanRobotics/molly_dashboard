@@ -1,4 +1,4 @@
-export type GaitMode = "IDLE" | "TROT" | "WALK" | "STANCE" | "CLIMB";
+export type GaitMode = "STANDARD" | "CRAWL" | "H-STEP" | "STAIR";
 
 export type SpeedMode = "LOW" | "MEDIUM" | "FAST";
 
